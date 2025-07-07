@@ -1,0 +1,355 @@
+/*obstacle avoiding, Bluetooth control, voice control robot car.
+   https://srituhobby.com
+*/
+#include <Servo.h>
+#include <AFMotor.h>
+#define Echo A0
+#define Trig A1
+#define motor 10
+#define Speed 170
+#define spoint 103
+char value;int distance;
+int Left;
+int Right;
+int L = 0;
+int R = 0;
+int L1 = 0;
+int R1 = 0;
+Servo servo;
+AF_DCMotor M1(1);
+AF_DCMotor M2(2);
+AF_DCMotor M3(3);
+AF_DCMotor M4(4);
+void setup() {
+  Serial.begin(9600);
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
+  servo.attach(motor);
+  M1.setSpeed(Speed);
+  M2.setSpeed(Speed);
+  M3.setSpeed(Speed);
+  M4.setSpeed(Speed);
+}
+void loop() {
+  Obstacle();
+  // Bluetoothcontrol();
+  //voicecontrol();
+}
+void Obstacle() {
+  distance = ultrasonic();
+  if (distance <= 12) {
+    Stop();
+    backward();
+    delay(100);
+    Stop();
+    L = leftsee();
+    servo.write(spoint);
+    delay(800);
+    R = rightsee();
+    servo.write(spoint);
+    if (L < R) {
+      right();
+      delay(500);
+      Stop();
+      delay(200);
+    } else if (L > R) {
+      left();
+      delay(500);
+      Stop();
+      delay(200);
+    }
+  } else {
+    forward();
+  }
+}
+int ultrasonic() {
+  digitalWrite(Trig, LOW);
+  delayMicroseconds(4);
+  digitalWrite(Trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trig, LOW);
+  long t = pulseIn(Echo, HIGH);
+  long cm = t / 29 / 2; //time convert distance
+  return cm;
+}
+void forward() {
+  M1.run(FORWARD);
+  M2.run(FORWARD);
+  M3.run(FORWARD);
+  M4.run(FORWARD);
+}
+void backward() {
+  M1.run(BACKWARD);
+  M2.run(BACKWARD);
+  M3.run(BACKWARD);
+  M4.run(BACKWARD);
+}
+void right() {
+  M1.run(BACKWARD);
+  M2.run(BACKWARD);
+  M3.run(FORWARD);
+  M4.run(FORWARD);
+}
+void left() {
+  M1.run(FORWARD);
+  M2.run(FORWARD);
+  M3.run(BACKWARD);
+  M4.run(BACKWARD);
+}
+void Stop() {
+  M1.run(RELEASE);
+  M2.run(RELEASE);
+  M3.run(RELEASE);
+  M4.run(RELEASE);
+}
+int rightsee() {
+  servo.write(20);
+  delay(800);
+  Left = ultrasonic();
+  return Left;
+}
+int leftsee() {
+  servo.write(180);
+  delay(800);
+  Right = ultrasonic();
+  return Right;
+}
+
+/*#include <Servo.h>
+#include <AFMotor.h>
+#define Echo A0
+#define Trig A1
+#define motor 10
+#define Speed 170
+#define spoint 103
+char value;
+int distance;
+int Left;
+int Right;
+int L = 0;
+int R = 0;
+int L1 = 0;
+int R1 = 0;
+Servo servo;
+AF_DCMotor M1(1);
+AF_DCMotor M2(2);
+AF_DCMotor M3(3);
+AF_DCMotor M4(4);
+void setup() {
+  Serial.begin(9600);
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
+  servo.attach(motor);
+  M1.setSpeed(Speed);
+  M2.setSpeed(Speed);
+  M3.setSpeed(Speed);
+  M4.setSpeed(Speed);
+}
+void loop() {
+  Obstacle();
+  // Bluetoothcontrol();
+  //voicecontrol();
+}
+void Obstacle() {
+  distance = ultrasonic();
+  if (distance <= 12) {
+    Stop();
+    backward();
+    delay(100);
+    Stop();
+    L = leftsee();
+    servo.write(spoint);
+    delay(800);
+    R = rightsee();
+    servo.write(spoint);
+    if (L < R) {
+      right();
+      delay(500);
+      Stop();
+      delay(200);
+    } else if (L > R) {
+      left();
+      delay(500);
+      Stop();
+      delay(200);
+    }
+  } else {
+    forward();
+  }
+}
+int ultrasonic() {
+  digitalWrite(Trig, LOW);
+  delayMicroseconds(4);
+  digitalWrite(Trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trig, LOW);
+  long t = pulseIn(Echo, HIGH);
+  long cm = t / 29 / 2; //time convert distance
+  return cm;
+}
+void forward() {
+  M1.run(FORWARD);
+  M2.run(FORWARD);
+  M3.run(FORWARD);
+  M4.run(FORWARD);
+}
+void backward() {
+  M1.run(BACKWARD);
+  M2.run(BACKWARD);
+  M3.run(BACKWARD);
+  M4.run(BACKWARD);
+}
+void right() {
+  M1.run(BACKWARD);
+  M2.run(BACKWARD);
+  M3.run(FORWARD);
+  M4.run(FORWARD);
+}
+void left() {
+  M1.run(FORWARD);
+  M2.run(FORWARD);
+  M3.run(BACKWARD);
+  M4.run(BACKWARD);
+}
+void Stop() {
+  M1.run(RELEASE);
+  M2.run(RELEASE);
+  M3.run(RELEASE);
+  M4.run(RELEASE);
+}
+int rightsee() {
+  servo.write(20);
+  delay(800);
+  Left = ultrasonic();
+  return Left;
+}
+int leftsee() {
+  servo.write(180);
+  delay(800);
+  Right = ultrasonic();
+  return Right;
+}
+
+
+// code for speed control of motor 
+
+#include <Servo.h>
+
+// Define constants and variables
+const int potPin = A0;      // Pin for the potentiometer
+const int motorPin = 9;     // Pin for the motor control (PWM)
+Servo motor;                // Servo object for controlling the motor
+int potValue = 0;           // Variable to store potentiometer value
+int motorSpeed = 0;         // Variable to store motor speed
+
+void setup() {
+  // Initialize serial communication for debugging
+  Serial.begin(9600);
+
+  // Attach the motor to the designated pin
+  motor.attach(motorPin);
+
+  // Print setup information
+  Serial.println("Speed Control Device Ready");
+}
+
+void loop() {
+  // Read the value from the potentiometer (0-1023)
+  potValue = analogRead(potPin);
+
+  // Map the potentiometer value to a speed range (0-180)
+  motorSpeed = map(potValue, 0, 1023, 0, 180);
+
+  // Write the speed to the motor
+  motor.write(motorSpeed);
+
+  // Print debug information to the serial monitor
+  Serial.print("Potentiometer Value: ");
+  Serial.print(potValue);
+  Serial.print(" | Motor Speed: ");
+  Serial.println(motorSpeed);
+
+  // Add a small delay for stability
+  delay(100);
+}
+
+
+
+// for  rotation 
+
+#include <Ultrasonic.h>
+
+// Define pins for motors
+const int motor1Pin1 = 2;
+const int motor1Pin2 = 3;
+const int motor2Pin1 = 4;
+const int motor2Pin2 = 5;
+const int motor3Pin1 = 6;
+const int motor3Pin2 = 7;
+const int motor4Pin1 = 8;
+const int motor4Pin2 = 9;
+
+// Define pins for ultrasonic sensor
+const int trigPin = 10;
+const int echoPin = 11;
+
+// Initialize ultrasonic sensor
+Ultrasonic ultrasonic(trigPin, echoPin);
+
+// Threshold distance for detecting push (in cm)
+const int pushThreshold = 10;
+
+void setup() {
+  // Set motor pins as output
+  pinMode(motor1Pin1, OUTPUT);
+  pinMode(motor1Pin2, OUTPUT);
+  pinMode(motor2Pin1, OUTPUT);
+  pinMode(motor2Pin2, OUTPUT);
+  pinMode(motor3Pin1, OUTPUT);
+  pinMode(motor3Pin2, OUTPUT);
+  pinMode(motor4Pin1, OUTPUT);
+  pinMode(motor4Pin2, OUTPUT);
+
+  // Initialize serial communication for debugging
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Get distance from ultrasonic sensor
+  long distance = ultrasonic.Ranging(CM);
+
+  // Check if a push is detected
+  if (distance < pushThreshold) {
+    Serial.println("Push detected! Rotating...");
+    perform360Rotation();
+  }
+
+  delay(100); // Small delay to avoid sensor noise
+}
+
+void perform360Rotation() {
+  // Rotate all motors in the same direction for 360-degree turn
+  digitalWrite(motor1Pin1, HIGH);
+  digitalWrite(motor1Pin2, LOW);
+  digitalWrite(motor2Pin1, HIGH);
+  digitalWrite(motor2Pin2, LOW);
+  digitalWrite(motor3Pin1, HIGH);
+  digitalWrite(motor3Pin2, LOW);
+  digitalWrite(motor4Pin1, HIGH);
+  digitalWrite(motor4Pin2, LOW);
+
+  delay(2000); // Adjust the delay based on your motor's speed for a full 360-degree turn
+
+  // Stop all motors
+  digitalWrite(motor1Pin1, LOW);
+  digitalWrite(motor1Pin2, LOW);
+  digitalWrite(motor2Pin1, LOW);
+  digitalWrite(motor2Pin2, LOW);
+  digitalWrite(motor3Pin1, LOW);
+  digitalWrite(motor3Pin2, LOW);
+  digitalWrite(motor4Pin1, LOW);
+  digitalWrite(motor4Pin2, LOW);
+
+  Serial.println("Rotation complete!");
+}
+*/
