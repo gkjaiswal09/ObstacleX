@@ -1,6 +1,4 @@
-/*obstacle avoiding robot car.
-   https://srituhobby.com
-*/
+/*obstacle avoiding robot car*/
 #include <Servo.h>
 #include <AFMotor.h>
 #define Echo A0
@@ -351,3 +349,4 @@ void perform360Rotation() {
   Serial.println("Rotation complete!");
 }
 */
+
